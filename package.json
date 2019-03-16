@@ -1,0 +1,16 @@
+{
+  "name": "processlist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "execute.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.1.0",
+    "node-cmd": "^3.0.0",
+    "node-powershell": "^4.0.0"
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>IIS Instance | Remote Debugging Help</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="../css/main.css">
+    <link rel="shortcut icon" href="../images/iis.png" type="image/x-icon">
+</head>
+
+<body>
+    <div class="sitecore-instances-table-container">
+        <div class="container">
+            <h2 class="font-normal">IIS Instances List</h2>
+            <ul class="responsive-table">
+                <li class="table-header">
+                    <div class="col col-1">Process Id</div>
+                    <div class="col col-2">Instance Name</div>
+                </li>
+                {{#each instances}}
+                <li class="table-row">
+                    <div class="col col-1" data-label="Process Id">{{pid}}</div>
+                    <div class="col col-2" data-label="Instance Name">{{name}}</div>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+    <div class="debugger-ports-container">
+        <div class="table">
+            <div class="table-cell"></div>
+            <div class="table-cell plattform">
+                <h3 class="clear-margin-bottom font-normal">VS 2015 Debugger</h3>
+            </div>
+            <div class="table-cell enterprise">
+                <h3 class="clear-margin-bottom font-normal">VS 2017 Debugger</h3>
+            </div>
+            <div class="table-cell cell-feature">Port Number</div>
+            <div class="table-cell">
+                <span>{{vs2015Debugger.port}}</span>
+            </div>
+            <div class="table-cell">
+                <span>{{vs2017Debugger.port}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="help-text">
+        <span>Hint: If you are not able to connect to the remote debugger but still see its port number, refresh this page a couple of times and try to attach again. Refreshing this page will automatically start the remote debuggers.</span>
+    </div>
+</body>
+
+</html>
