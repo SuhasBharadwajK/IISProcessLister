@@ -4,6 +4,7 @@ const cmd = require('node-cmd');
 const handlebars = require('handlebars');
 const fs = require('fs');
 
+// Platform specific and custom constants start
 const serverPort = 8097;
 const vs2015Port = "8085";
 const vs2015Path = "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\Packages\\Debugger\\X64";
@@ -11,6 +12,8 @@ const vs2015DebuggerName = "VS2015 Remote Debugger";
 const vs2017Port = "8091";
 const vs2017Path = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\Remote Debugger\\x64";
 const vs2017DebuggerName = "VS2017 Remote Debugger";
+// Platform specific and custom constants end
+
 const processIdKey = "ProcessId";
 const commandLineKey = "CommandLine";
 const nameKey = "Name";
