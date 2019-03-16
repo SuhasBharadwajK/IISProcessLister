@@ -16,13 +16,19 @@
             <h2 class="font-normal">IIS Instances List</h2>
             <ul class="responsive-table">
                 <li class="table-header">
-                    <div class="col col-1">Process Id</div>
+                    <div class="col col-2">Process Id</div>
                     <div class="col col-2">Instance Name</div>
+                    <div class="col col-2">Port Number</div>
+                    <div class="col col-2">Is Site Running</div>
+                    <div class="col col-2">Is Worker Process Running</div>
                 </li>
                 {{#each instances}}
                 <li class="table-row">
-                    <div class="col col-1" data-label="Process Id">{{pid}}</div>
+                    <div class="col col-2" data-label="Process Id">{{pid}}</div>
                     <div class="col col-2" data-label="Instance Name">{{name}}</div>
+                    <div class="col col-2" data-label="Port">{{port}}</div>
+                    <div class="col col-2" data-label="Site Status">{{isSiteRunning}}</div>
+                    <div class="col col-2" data-label="Worker Process Status">{{isWorkerProcessRunning}}</div>
                 </li>
                 {{/each}}
             </ul>
@@ -47,7 +53,7 @@
         </div>
     </div>
     <div class="help-text">
-        <span>Hint: If you are not able to connect to the remote debugger but still see its port number, refresh this page a couple of times and try to attach again. Refreshing this page will automatically start the remote debuggers.</span>
+        <span><b>Hint: </b>If you do not see port numbers of remote debuggers or are not able to connect to the remote debugger but still see its port number, refresh this page a couple of times and try to attach again. Refreshing this page will automatically start the remote debuggers.</span>
     </div>
 </body>
 

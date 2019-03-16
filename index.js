@@ -13,6 +13,10 @@ const vs2017Path = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Ente
 const vs2017DebuggerName = "VS2017 Remote Debugger";
 const processIdKey = "ProcessId";
 const commandLineKey = "CommandLine";
+const nameKey = "Name";
+const siteRunningStatus = "Started";
+const siteStateKey = "State";
+const siteBindingsKey = "Bindings";
 
 // For lack of a better security measure, only css and png content is allowed for now.
 const allowedFileTypes = [
@@ -84,7 +88,7 @@ var getIISProcesses = function () {
                 processes = [];
                 var outputLines = output.trim().split('\n');
                 if (outputLines.length > 2) {
-                    var commands = output.trim().split('\n').splice(2);
+                    var commands = output.trim().split('\n').slice(2);
                     commands.forEach(command => {
                         var lineComponents = command.split(" ").filter(i => i.length);
                         var name = lineComponents[3].replace(/"/g, "").trim().replace("AppPool", "");
@@ -92,17 +96,33 @@ var getIISProcesses = function () {
                         if (!processes.some(p => p.name === name)) {
                             processes.push(new Process({
                                 pid: processId,
-                                name: name
+                                name: name,
+                                isRunning: true
                             }));
                         }
                     });
                 }
-    
-                getDebuggerInstances().then((debuggerProcesses) => {
-                    resolve(processes.concat(debuggerProcesses));
+
+                getAllInstances().then((allInstances) => {
+                    allInstances.forEach(instance => {
+                        if (!processes.some(p => p.name == instance.name)) {
+                            processes.push(instance);
+                        }
+                        else {
+                            var index = processes.findIndex(p => p.name == instance.name);
+                            processes[index].port = instance.port;
+                        }
+                    });
+
+                    getDebuggerInstances().then((debuggerProcesses) => {
+                        resolve(processes.concat(debuggerProcesses));
+                    }, () => {
+                        reject();
+                    });
                 }, () => {
                     reject();
                 });
+    
     
                 ps.dispose();
             }).catch(err => {
@@ -110,6 +130,39 @@ var getIISProcesses = function () {
                 ps.dispose();
                 reject();
             });
+    });
+}
+
+var getAllInstances = function() {
+    var ps = new Shell({
+        executionPolicy: 'Bypass',
+        noProfile: true
+    });
+
+    ps.addCommand('Get-IISSite | Format-List Name, State, Bindings');
+    return new Promise((resolve, reject) => {
+        ps.invoke()
+        .then(output => {
+            var allSites = [];
+            var lines = output.trim().split('\n\r').filter(l => l.length);
+            lines.forEach(line => {
+                var lineJson = jsonify(line);
+                var ports = lineJson[siteBindingsKey].match(/\s(80|443|([1-9][0-9]{3,4}))\s/g) || [];
+                allSites.push(new Process({
+                    name: lineJson[nameKey],
+                    isRunning: lineJson[siteStateKey] == siteRunningStatus,
+                    port: ports.unique().map(Function.prototype.call, String.prototype.trim).join(', ')
+                }));
+            });
+
+            ps.dispose();
+            resolve(allSites);
+        })
+        .catch(error => {
+            console.log(error);
+            ps.dispose();
+            reject();
+        });
     });
 }
 
@@ -139,7 +192,8 @@ var getDebuggerInstances = function () {
                                     pid: pid,
                                     name: name,
                                     port: port,
-                                    isDebuggerProcess: true
+                                    isDebuggerProcess: true,
+                                    isRunning: true
                                 }));
                             }
                         }
@@ -206,7 +260,7 @@ var jsonify = function (input) {
                 value = lineComponents.slice(1, lineComponents.length).join(' ');
             }
 
-            result[lineComponents[0].trim()] = value;
+            result[lineComponents[0].trim()] = value.trim();
         } else if (lineComponents.length == 1) {
             var resultKeys = Object.keys(result);
             var lastKey = resultKeys[resultKeys.length - 1];
@@ -222,9 +276,29 @@ server.listen(serverPort, () => {
 });
 
 var Process = function (args) {
-    this.pid = args ? args.pid : null;
+    this.pid = args && args.pid ? args.pid : "N/A";
     this.name = args ? args.name : null;
     this.path = args ? args.path : null;
     this.port = args ? args.port : null;
+    this.isRunning = args ? args.isRunning : false;
+    this.isSiteRunning = this.isRunning ? "Yes" : "No";
+    this.isWorkerProcessRunning = this.isRunning && this.pid !== "N/A" && this.pid.length ? "Yes" : "No";
     this.isDebuggerProcess = !!args.isDebuggerProcess;
+}
+
+Array.prototype.contains = function(v) {
+    for(var i = 0; i < this.length; i++) {
+        if(this[i] === v) return true;
+    }
+    return false;
+};
+
+Array.prototype.unique = function() {
+    var arr = [];
+    for(var i = 0; i < this.length; i++) {
+        if(!arr.includes(this[i])) {
+            arr.push(this[i]);
+        }
+    }
+    return arr; 
 }

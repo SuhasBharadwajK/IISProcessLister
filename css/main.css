@@ -202,4 +202,13 @@ h2 small {
     margin: 0 auto;
     max-width: 1000px;
     margin-top: 40px;
+    margin-bottom: 40px;
+    border-radius: 5px;
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+
+.help-text span {
+    display: inline-block;
+    padding: 20px;
 }
