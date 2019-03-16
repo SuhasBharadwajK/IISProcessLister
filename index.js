@@ -81,6 +81,7 @@ var getIISProcesses = function () {
     return new Promise((resolve, reject) => {
         ps.invoke()
             .then(output => {
+                processes = [];
                 var outputLines = output.trim().split('\n');
                 if (outputLines.length > 2) {
                     var commands = output.trim().split('\n').splice(2);
@@ -118,10 +119,11 @@ var getDebuggerInstances = function () {
         noProfile: true
     });
 
-    ps.addCommand('Get-WmiObject Win32_Process -Filter "name=\'msvsmon.exe\'" | Format-List ProcessId, Name, Path, CommandLine | Write-Output');
+    ps.addCommand('Get-WmiObject Win32_Process -Filter "name=\'msvsmon.exe\'" | Format-List ProcessId, Name, Path, CommandLine');
     return new Promise((resolve, reject) => {
         ps.invoke()
             .then(output => {
+                debuggerProcesses = [];
                 var outputLines = output.trim().split('\n\r').filter(l => l.length);
                 if (outputLines.length) {
                     outputLines.forEach(line => {
